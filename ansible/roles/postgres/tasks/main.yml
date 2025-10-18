@@ -1,0 +1,19 @@
+---
+- name: Ensure PostgreSQL service is running
+  service:
+    name: postgresql
+    state: started
+    enabled: yes
+
+- name: Ensure database user exists
+  community.postgresql.postgresql_user:
+    name: "{{ db_user }}"
+    password: "{{ db_password }}"
+    role_attr_flags: "LOGIN"
+  become_user: postgres
+
+- name: Ensure database exists
+  community.postgresql.postgresql_db:
+    name: "{{ db_name }}"
+    owner: "{{ db_user }}"
+  become_user: postgres

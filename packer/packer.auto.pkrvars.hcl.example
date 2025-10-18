@@ -1,0 +1,4 @@
+folder_id  = "FOLDER_ID"
+subnet_id  = "SUBNET_ID"
+zone       = "ZONE"
+image_name = "IMAGE_NAME"

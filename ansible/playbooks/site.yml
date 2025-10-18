@@ -1,0 +1,11 @@
+---
+- name: My Flask App
+  hosts: web
+  become: true
+  vars:
+    app_src: "/tmp/app/expert_octo_pancake"
+  roles:
+    - common
+    - app
+    - nginx
+    - postgres

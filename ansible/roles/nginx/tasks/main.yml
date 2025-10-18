@@ -1,0 +1,65 @@
+---
+- name: Check if apache2 is installed
+  command: systemctl is-enabled apache2
+  register: apache_enabled
+  failed_when: false
+  changed_when: false
+
+- name: Stop and disable apache2 if present
+  service:
+    name: apache2
+    state: stopped
+    enabled: no
+  when: apache_enabled.rc == 0
+
+- name: Check port 80 usage
+  shell: "ss -ltnp | grep ':80 ' || true"
+  register: port80
+  changed_when: false
+
+- name: Debug port 80 usage
+  debug:
+    var: port80.stdout
+
+- name: Remove default site (optional)
+  file:
+    path: /etc/nginx/sites-enabled/default
+    state: absent
+  notify:
+    - Test nginx config
+    - Reload nginx
+
+- name: Place NGINX site config
+  template:
+    src: nginx.conf.j2
+    dest: /etc/nginx/sites-available/{{ app_name }}.conf
+    owner: root
+    group: root
+    mode: "0644"
+  notify:
+    - Test nginx config
+    - Reload nginx
+
+- name: Enable site
+  file:
+    src: /etc/nginx/sites-available/{{ app_name }}.conf
+    dest: /etc/nginx/sites-enabled/{{ app_name }}.conf
+    state: link
+  notify:
+    - Test nginx config
+    - Reload nginx
+
+- name: Validate nginx config
+  command: nginx -t
+  register: nginx_config_test
+  changed_when: false
+
+- name: Show nginx -t output
+  debug:
+    var: nginx_config_test.stderr_lines
+
+- name: Ensure nginx is running
+  service:
+    name: nginx
+    state: started
+    enabled: yes
