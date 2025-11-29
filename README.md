@@ -1,8 +1,19 @@
-# expert-octo-pancake
-My Flask app with Packer and Ansible
+# expert-octo-pancake (Kubernetes)
 
+Практическая работа №10
+
+### Развертывание с помощью kubectl
+
+Примените все манифесты, используя утилиту `kubectl`:
 
 ```bash
-cd packer
-packer build -var-file="packer.auto.pkrvars.hcl" flask-nginx-postgres.pkr.hcl
+kubectl apply -f manifests/
+```
+
+### Развертывание с помощью Helm
+
+Установка релиза с помощью утилиты `helm` в Namespace `production`:
+
+```bash
+helm install my-release ./helm-charts/my-web-app -n production --create-namespace
 ```

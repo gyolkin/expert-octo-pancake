@@ -1,0 +1,29 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "my-web-app.fullname" . }}-backend
+  labels:
+    {{- include "my-web-app.labels" . | nindent 4 }}
+    app.kubernetes.io/component: backend
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "my-web-app.selectorLabels" . | nindent 6 }}
+      app.kubernetes.io/component: backend
+  template:
+    metadata:
+      labels:
+        {{- include "my-web-app.selectorLabels" . | nindent 8 }}
+        app.kubernetes.io/component: backend
+    spec:
+      containers:
+        - name: backend
+          image: "{{ .Values.backend.image.repository }}:{{ .Values.image.tag }}"
+          ports:
+            - containerPort: {{ .Values.backend.service.port }}
+          livenessProbe:
+{{- toYaml .Values.backend.livenessProbe | nindent 12 }}
+          readinessProbe:
+{{- toYaml .Values.backend.readinessProbe | nindent 12 }}
+
